@@ -23,7 +23,7 @@ class CreateProductsTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Add index on category column
+            
             $table->index('category');
         });
     }

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Product Inventory Management</title>
     
-    <!-- App CSS -->
+    
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
 <body>

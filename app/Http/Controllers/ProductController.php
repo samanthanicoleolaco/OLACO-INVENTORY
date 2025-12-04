@@ -4,89 +4,82 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index(): JsonResponse
+    public function index()
     {
         $products = Product::orderBy('product_name', 'asc')->get();
-        return response()->json($products);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'product_name' => 'required|max:255',
-            'description' => 'nullable',
-            'price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'category' => 'nullable|max:255',
+        return response()->json([
+            'data' => $products
         ]);
-
-        $product = Product::create($validated);
-
-        return response()->json($product, 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $product = Product::findOrFail($id);
-        return response()->json($product);
+        return response()->json([
+            'data' => $product
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(Request $request, $id): JsonResponse
+    public function store(Request $request)
     {
-        $product = Product::findOrFail($id);
-
         $validated = $request->validate([
-            'product_name' => 'required|max:255',
-            'description' => 'nullable',
+            'product_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
-            'category' => 'nullable|max:255',
+            'category' => 'nullable|string|max:255'
         ]);
 
-        $product->update($validated);
+        $product = Product::create([
+            'product_name' => $validated['product_name'],
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'quantity' => $validated['quantity'],
+            'category' => $validated['category'] ?? null
+        ]);
 
-        return response()->json($product);
+        return response()->json([
+            'message' => 'Product created successfully',
+            'data' => $product
+        ], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id): JsonResponse
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        
+        $validated = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'category' => 'nullable|string|max:255'
+        ]);
+
+        $product->update([
+            'product_name' => $validated['product_name'],
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'quantity' => $validated['quantity'],
+            'category' => $validated['category'] ?? null
+        ]);
+
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'data' => $product
+        ]);
+    }
+
+    public function destroy($id)
     {
         $product = Product::findOrFail($id);
         $product->delete();
-
-        return response()->json(['message' => 'Product deleted successfully']);
+        
+        return response()->json([
+            'message' => 'Product deleted successfully'
+        ]);
     }
 }
